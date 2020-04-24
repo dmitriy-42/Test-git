@@ -16,11 +16,22 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    camera.cpp \
+    govector.cpp \
+    grapcollitem.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    map.cpp \
+    units.cpp
 
 HEADERS += \
-    mainwindow.h
+    camera.h \
+    connect.h \
+    govector.h \
+    grapcollitem.h \
+    mainwindow.h \
+    map.h \
+    units.h
 
 FORMS += \
     mainwindow.ui

@@ -1,6 +1,12 @@
 #include "mainwindow.h"
-
 #include <QApplication>
+#include <QFrame>
+
+#ifdef __WIN32__
+   WORD versionWanted = MAKEWORD(1, 1);
+   WSADATA wsaData;
+   WSAStartup(versionWanted, &wsaData);
+#endif
 
 int main(int argc, char *argv[])
 {
