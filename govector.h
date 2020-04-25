@@ -1,6 +1,7 @@
 #ifndef GOVECTOR_H
 #define GOVECTOR_H
 #include <cmath>
+#define PI 3.14159265                               // число ПИ
 
 class GoVector
 {
@@ -16,6 +17,7 @@ public:
   double getX();
   double getY();
   double getZ();
+  double getA();
 private:
   double x,y,z;
   bool ifClear();

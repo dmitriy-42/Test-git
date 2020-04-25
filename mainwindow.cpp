@@ -11,15 +11,21 @@ MainWindow::MainWindow(QWidget *parent)
 
   scene = new QGraphicsScene(this);
   ui->graphicsView->setScene(scene);
+  ui->graphicsView_2->setScene(scene);
 
   connect(ui->close,SIGNAL(clicked()),qApp,SLOT(quit()));
   connect(ui->mapEdit,SIGNAL(clicked()),this,SLOT(initMapEdit()));
   connect(ui->mainMenu,SIGNAL(clicked()),this,SLOT(exitMapEdit()));
+
+  camera = new Camera;
+  MyMap = new Map(scene, camera);
 }
 
 MainWindow::~MainWindow()
 {
+  delete MyMap;
   delete ui;
+  delete camera;
 }
 
 

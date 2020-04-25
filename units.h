@@ -1,11 +1,14 @@
 #ifndef UNITS_H
 #define UNITS_H
 #include "map.h"
+#include "sprite.h"
+#include "govector.h"
+#include "grapcollitem.h"
 
 const int MaxGun = 10;
-enum gunType{};
-enum ArrmorType{};
-enum MoveType{};
+enum gunType{Gun, Minigun, Arty};
+enum ArrmorType{Light, Medium, Heavy, Over};
+enum MoveType{Wheels, Tracks, Plane, Jet};
 struct gunSlot
 {
   double x, y;
@@ -26,10 +29,24 @@ class Unit
 public:
   Unit();
   ~Unit();
+
   void act();
+  void move();
+  void dead();
+
+private:
   double x;
   double y;
-private:
+  double a;
+  double r;
+  bool isColl(GrapCollItem*);
+  bool isCollLand(GrapCollItem*);
+  bool isCollAir(GrapCollItem*);
+  double health;
+  GrapCollItem* GrItem;
+  QGraphicsScene* scene;
+  GoVector* moveVect;
+
   class Gun
   {
   public:
@@ -50,11 +67,12 @@ private:
   {
   public:
     virtual int speed() = 0;
+    virtual MoveType Type() = 0;
   };
 
   Gun* guns[MaxGun];
   Arrmor* arrmor;
-  Move* move;
+  Move* myMove;
 };
 
 

@@ -22,6 +22,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     map.cpp \
+    sprite.cpp \
     units.cpp
 
 HEADERS += \
@@ -31,6 +32,7 @@ HEADERS += \
     grapcollitem.h \
     mainwindow.h \
     map.h \
+    sprite.h \
     units.h
 
 FORMS += \

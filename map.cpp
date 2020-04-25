@@ -28,6 +28,29 @@ void Block::delUnit(Unit *unit)
   units.erase(unit);
 }
 
+void Block::act()
+{
+  for(auto it = units.begin();it != units.end(); ++it)
+  {
+    it->second->act();
+  }
+}
+
+void Block::move()
+{
+  for(auto it = units.begin();it != units.end(); ++it)
+  {
+    it->second->move();
+  }
+}
+
+void Block::dead()
+{
+  for(auto it = units.begin();it != units.end(); ++it)
+  {
+    it->second->dead();
+  }
+}
 
 
 Map::Map(QGraphicsScene *scene, Camera* camera)
@@ -43,11 +66,27 @@ Map::~Map()
 
 void Map::clear()
 {
-  for(auto it = mapBlock.begin();it != mapBlock.end(); ++it)
+  for (auto it = mapBlock.begin();it != mapBlock.end(); ++it)
   {
     delete it->second;
   }
   mapBlock.clear();
+}
+
+void Map::start()
+{
+  for (auto it = mapBlock.begin();it != mapBlock.end(); ++it)
+  {
+    it->second->act();
+  }
+  for (auto it = mapBlock.begin();it != mapBlock.end(); ++it)
+  {
+    it->second->move();
+  }
+  for (auto it = mapBlock.begin();it != mapBlock.end(); ++it)
+  {
+    it->second->dead();
+  }
 }
 
 

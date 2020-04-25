@@ -51,6 +51,11 @@ double GoVector::getX(){return x;}
 double GoVector::getY(){return y;}
 double GoVector::getZ(){return z;}
 
+double GoVector::getA()
+{
+  return atan(y/x);
+}
+
 bool GoVector::ifClear()
 {
   return x == 0 and y == 0 and z == 0;

@@ -1,7 +1,7 @@
 #include "grapcollitem.h"
 
 GrapCollItem::GrapCollItem(double realX, double realY, double realA, TypeObject type, Sprite* sprite, Camera* camera)
-    :realX(realX), realY(realY), realA(realA), type(type), sprite(sprite), camera(camera)
+    :realX(realX), realY(realY), realA(realA), realR(sqrt(sprite->h*sprite->h+sprite->w*sprite->w)/2), type(type), sprite(sprite), camera(camera)
 {
   int z;
   switch (type)
@@ -21,7 +21,9 @@ GrapCollItem::GrapCollItem(double realX, double realY, double realA, TypeObject 
 
 QRectF GrapCollItem::boundingRect() const
 {
-  return QRectF(realX - camera->getX(), realY - camera->getY(), sprite->w / camera->getH(), sprite->h / camera->getH());
+  double h = camera->getH();
+  return QRectF((realX - camera->getX())/h, (realY - camera->getY())/h,
+                (realX - camera->getX() - sprite->w) / h, (realY - camera->getY() - sprite->h) / h);
 }
 
 void GrapCollItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
@@ -30,6 +32,7 @@ void GrapCollItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWi
   painter->drawImage(boundingRect(), sprite->tex);
 }
 
+double GrapCollItem::getRealR(){return realR;}
 double GrapCollItem::getRealX(){return realX;}
 double GrapCollItem::getRealY(){return realY;}
 double GrapCollItem::getRealA(){return realA;}
@@ -42,3 +45,5 @@ void GrapCollItem::setRealPos(double x, double y, double a)
   realY = y;
   realA = a;
 }
+
+

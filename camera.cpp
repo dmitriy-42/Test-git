@@ -8,3 +8,4 @@ Camera::Camera()
 double Camera::getX(){return 0;}
 double Camera::getY(){return 0;}
 double Camera::getA(){return 0;}
+double Camera::getH(){return 0;}

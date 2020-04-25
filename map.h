@@ -4,12 +4,15 @@
 #include "grapcollitem.h"
 #include <QGraphicsScene>
 #include <stack>
+#include "sprite.h"
 
 #include <map>
 #include <utility>
 typedef std::pair<int, int> Coord;
 
 enum class TypeBlock{Default};
+
+class Unit;
 
 
 class Block
@@ -19,6 +22,10 @@ public:
   ~Block();
   void addUnit(Unit* unit);
   void delUnit(Unit* unit);
+
+  void act();
+  void move();
+  void dead();
 private:
   GrapCollItem* grap;
   int x,y;
@@ -36,6 +43,8 @@ public:
   void set(int x, int y, Block*);
   Block* get(int x, int y);
   void clear();
+
+  void start();
 private:
   QGraphicsScene *scene;
   std::map <Coord, Block*> mapBlock;
