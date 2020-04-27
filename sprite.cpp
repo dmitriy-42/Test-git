@@ -93,6 +93,18 @@ void Sprites::append(Sprite* sprite)
   if (i == -1) set(0, sprite);
 }
 
+void Sprites::append(const char *name, double w, double h)
+{
+  Sprite* sprite = new Sprite;
+  std::cout << "load...\n";
+  if (sprite->tex->load(name))
+    std::cerr << "error load " << name << "\n";
+  sprite->w = w;
+  sprite->h = h;
+
+  append(sprite);
+}
+
 void Sprites::del(int index)
 {
   if (size < index or index + size < 0) IndexError(this, index, "del");

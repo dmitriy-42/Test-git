@@ -41,3 +41,38 @@ void Unit::dead()
 {
   if (health <= 0) delete this;
 }
+
+bool Unit::isColl(GrapCollItem * Item)
+{
+  switch (myMove->Type())
+  {
+    case MoveType::Jet:
+    case MoveType::Plane: return isCollAir(Item);
+    case MoveType::Tracks:
+    case MoveType::Wheels: return isCollLand(Item);
+    default:
+      std::cerr << "isColl default\n";
+      return false;
+  }
+}
+
+bool Unit::isCollLand(GrapCollItem * Item)
+{
+  switch (Item->getType())
+  {
+    case TypeObject::Unit:
+    case TypeObject::Stone:
+    case TypeObject::Resource:
+    case TypeObject::Building: return true;
+    default: return false;
+  }
+}
+
+bool Unit::isCollAir(GrapCollItem * Item)
+{
+  switch (Item->getType())
+  {
+    case TypeObject::UnitAir: return true;
+    default: return false;
+  }
+}

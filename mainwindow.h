@@ -4,6 +4,7 @@
 #include "sprite.h"
 #include <QMainWindow>
 #include <QGraphicsScene>
+#include <QTimer>
 #include "camera.h"
 #include "connect.h"
 #include "map.h"
@@ -23,11 +24,13 @@ public:
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 private:
+  QTimer* timer1;
+  Sprites* sprites;
   Camera* camera;
   Ui::MainWindow *ui;
   QGraphicsScene *scene;
   Connect* con;
-  Map* MyMap;
+  Map* myMap;
 private slots:
   void initMapEdit();
   void exitMapEdit();

@@ -4,6 +4,7 @@
 #include "sprite.h"
 #include "govector.h"
 #include "grapcollitem.h"
+#include <iostream>
 
 const int MaxGun = 10;
 enum gunType{Gun, Minigun, Arty};
@@ -27,8 +28,12 @@ struct gunSlots
 class Unit
 {
 public:
+  //Unit(ArrmorType, MoveType);
   Unit();
   ~Unit();
+
+  int getSlotLen();
+  void init(double x, double y, gunType[MaxGun]);
 
   void act();
   void move();

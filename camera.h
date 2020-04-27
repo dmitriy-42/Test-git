@@ -1,8 +1,9 @@
 #ifndef CAMERA_H
 #define CAMERA_H
+#include <QObject>
 
 
-class Camera
+class Camera//: public  QObject
 {
 public:
   Camera();
@@ -11,7 +12,8 @@ public:
   double getA();
   double getH();
 private:
-  double x,y;
+  double x,y,h,a;
+//public slots:
 };
 
 #endif // CAMERA_H

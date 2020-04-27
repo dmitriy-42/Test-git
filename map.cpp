@@ -3,6 +3,17 @@
 Block::Block(int x, int y, Sprite *sprite, QGraphicsScene *scene, Camera* camera)
   :x(x), y(x), scene(scene)
 {
+  std::cout << "Block create\n";
+  grap = new GrapCollItem(x, y, 0, TypeObject::Block, sprite, camera);
+  scene->addItem(grap);
+}
+
+Block::Block(Sprite *sprite, QGraphicsScene *scene, Camera *camera)
+  :scene(scene)
+{
+  std::cout << "Block create\n";
+  x = 0;
+  y = 0;
   grap = new GrapCollItem(x, y, 0, TypeObject::Block, sprite, camera);
   scene->addItem(grap);
 }
@@ -49,12 +60,41 @@ void Block::dead()
   for(auto it = units.begin();it != units.end(); ++it)
   {
     it->second->dead();
-  }
+    }
+}
+
+int Block::getX()
+{
+  return x;
+}
+
+int Block::getY()
+{
+  return y;
+}
+
+void Block::setX(int x)
+{
+  this->x = x;
+  grap->setX(x);
+}
+
+void Block::setY(int y)
+{
+  this->y = y;
+  grap->setX(y);
+}
+
+void Block::setPos(int x, int y)
+{
+  this->x = x;
+  this->y = y;
+  grap->setRealPos(x, y, grap->getRealA());
 }
 
 
-Map::Map(QGraphicsScene *scene, Camera* camera)
-  :scene(scene), camera(camera)
+Map::Map(QGraphicsScene *scene, Camera* camera, Sprites* sprites)
+  :scene(scene), camera(camera), sprites(sprites)
 {
   //to do
 }
@@ -96,6 +136,12 @@ void Map::save(char*){}
 void Map::set(int x, int y, Block* block)
 {
   Coord crd = std::make_pair(x,y);
+  mapBlock[crd] = block;
+}
+
+void Map::set(Block * block)
+{
+  Coord crd = std::make_pair(block->getX(), block->getY());
   mapBlock[crd] = block;
 }
 

@@ -11,7 +11,7 @@ void IndexError(int index, const char* f);
 
 struct Sprite
 {
-  QImage tex;
+  QImage* tex;
   double w, h; // not pixel
 };
 
@@ -26,6 +26,7 @@ public:
   void resize(int newSize);
   void free();
   void append(Sprite* sprite);
+  void append(const char* name,double w,double h);
   void del(int index);
   int getSize();
 

@@ -22,6 +22,8 @@ GrapCollItem::GrapCollItem(double realX, double realY, double realA, TypeObject 
 QRectF GrapCollItem::boundingRect() const
 {
   double h = camera->getH();
+  std::cout << (realX - camera->getX())/h << " " << (realY - camera->getY())/h << " "
+            << (realX - camera->getX() - sprite->w) / h << " " << (realY - camera->getY() - sprite->h) / h << "\n";
   return QRectF((realX - camera->getX())/h, (realY - camera->getY())/h,
                 (realX - camera->getX() - sprite->w) / h, (realY - camera->getY() - sprite->h) / h);
 }
@@ -29,7 +31,7 @@ QRectF GrapCollItem::boundingRect() const
 void GrapCollItem::paint(QPainter *painter, const QStyleOptionGraphicsItem*, QWidget*)
 {
   setRotation(realA - camera->getA());
-  painter->drawImage(boundingRect(), sprite->tex);
+  painter->drawImage(boundingRect(), *(sprite->tex));
 }
 
 double GrapCollItem::getRealR(){return realR;}
