@@ -35,6 +35,7 @@ Sprite* Sprites::get(int index)
   return data[index];
 }
 
+
 void Sprites::set(int index, Sprite* sprite)
 {
   if (size < index or index + size < 0) IndexError(this, index, "set");
@@ -93,23 +94,27 @@ void Sprites::append(Sprite* sprite)
   if (i == -1) set(0, sprite);
 }
 
-void Sprites::append(const char *name, double w, double h)
+void Sprites::set(int index, QImage *image, double sizeSprite)
 {
-  Sprite* sprite = new Sprite;
-  std::cout << "load...\n";
-  if (sprite->tex->load(name))
-    std::cerr << "error load " << name << "\n";
-  sprite->w = w;
-  sprite->h = h;
-
-  append(sprite);
+  Sprite* sprite;
+  sprite = new Sprite;
+  sprite->tex = image;
+  double w = sprite->tex->width();
+  double h = sprite->tex->height();
+  double max;
+  if (w < h) max = h;
+  else max = w;
+  sprite->w = (w/max) * sizeSprite;
+  sprite->h = (h/max) * sizeSprite;
+  set(index, sprite);
 }
+
 
 void Sprites::del(int index)
 {
   if (size < index or index + size < 0) IndexError(this, index, "del");
   if (index < 0) index += size;
-  if (data[index] == nullptr) delete data[index];
+  if (data[index] != nullptr) delete data[index];
 }
 
 int Sprites::getSize()

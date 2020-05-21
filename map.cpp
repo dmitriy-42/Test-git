@@ -3,64 +3,23 @@
 Block::Block(int x, int y, Sprite *sprite, QGraphicsScene *scene, Camera* camera)
   :x(x), y(x), scene(scene)
 {
-  std::cout << "Block create\n";
-  grap = new GrapCollItem(x, y, 0, TypeObject::Block, sprite, camera);
+  grap = new GrapCollItem(x, y, 0, TypeObject::Block, sprite, camera, nullptr, this);
   scene->addItem(grap);
 }
 
 Block::Block(Sprite *sprite, QGraphicsScene *scene, Camera *camera)
   :scene(scene)
 {
-  std::cout << "Block create\n";
   x = 0;
   y = 0;
-  grap = new GrapCollItem(x, y, 0, TypeObject::Block, sprite, camera);
+  grap = new GrapCollItem(x, y, 0, TypeObject::Block, sprite, camera, nullptr, this);
   scene->addItem(grap);
 }
 
 Block::~Block()
 {
-  for(auto it = units.begin();it != units.end(); ++it)
-  {
-    delete it->second;
-  }
-
   scene->removeItem(grap);
   delete grap;
-}
-
-void Block::addUnit(Unit *unit)
-{
-  units[unit] = unit;
-}
-
-void Block::delUnit(Unit *unit)
-{
-  units.erase(unit);
-}
-
-void Block::act()
-{
-  for(auto it = units.begin();it != units.end(); ++it)
-  {
-    it->second->act();
-  }
-}
-
-void Block::move()
-{
-  for(auto it = units.begin();it != units.end(); ++it)
-  {
-    it->second->move();
-  }
-}
-
-void Block::dead()
-{
-  for(auto it = units.begin();it != units.end(); ++it)
-  {
-    it->second->dead();
-    }
 }
 
 int Block::getX()
@@ -101,6 +60,10 @@ Map::Map(QGraphicsScene *scene, Camera* camera, Sprites* sprites)
 
 Map::~Map()
 {
+  for(auto it = units.begin();it != units.end(); ++it)
+  {
+    delete it->second;
+  }
   clear();
 }
 
@@ -115,18 +78,11 @@ void Map::clear()
 
 void Map::start()
 {
-  for (auto it = mapBlock.begin();it != mapBlock.end(); ++it)
-  {
-    it->second->act();
-  }
-  for (auto it = mapBlock.begin();it != mapBlock.end(); ++it)
-  {
-    it->second->move();
-  }
-  for (auto it = mapBlock.begin();it != mapBlock.end(); ++it)
-  {
-    it->second->dead();
-  }
+  std::cout << "start\n";
+  act();
+  move();
+  deadUnit.clear();
+  dead();
 }
 
 
@@ -153,5 +109,69 @@ Block* Map::get(int x, int y)
     return mapBlock.at(crd);
   }  catch (std::out_of_range &) {
     return nullptr;
+  }
+}
+
+
+void Map::addUnit(Unit *unit)
+{
+  units[unit] = unit;
+}
+
+void Map::delUnit(Unit *unit)
+{
+  deadUnit.push_back(unit);
+
+  units.erase(unit);
+  delete unit;
+}
+
+void Map::addAmmo(BaseAmmo *ammo)
+{
+  ammos[ammo] = ammo;
+}
+
+void Map::delAmmo(BaseAmmo *ammo)
+{
+  this->ammos.erase(ammo);
+  delete ammo; //virtual ~BaseAmmo();
+}
+
+void Map::act()
+{
+
+  for(auto it = ammos.begin();it != ammos.end(); ++it)
+  {
+    it->second->act();
+  }
+
+  for(auto it = units.begin();it != units.end(); ++it)
+  {
+    it->second->act();
+  }
+
+}
+
+void Map::move()
+{
+  for(auto it = ammos.begin();it != ammos.end(); ++it)
+  {
+    it->second->move();
+  }
+  for(auto it = units.begin();it != units.end(); ++it)
+  {
+    it->second->move();
+  }
+}
+
+void Map::dead()
+{
+  for(auto it = ammos.begin();it != ammos.end(); ++it)
+  {
+    if (it->second->dead()) delAmmo(it->second);
+  }
+  for(auto it = units.begin();it != units.end(); ++it)
+  {
+    if (it->second->dead()) delUnit(it->second);
   }
 }

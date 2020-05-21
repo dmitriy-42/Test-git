@@ -1,6 +1,7 @@
+#include "collres.h"
+
 #include "mainwindow.h"
-#include <QApplication>
-#include <QFrame>
+
 
 #ifdef __WIN32__
    WORD versionWanted = MAKEWORD(1, 1);

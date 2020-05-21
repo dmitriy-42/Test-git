@@ -1,4 +1,4 @@
-RESOURCES += images.qrc
+RESOURCES += sprites.qrc
 
 QT       += core gui
 
@@ -18,6 +18,9 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    ammo.cpp \
+    brain.cpp \
+    build.cpp \
     camera.cpp \
     govector.cpp \
     grapcollitem.cpp \
@@ -28,7 +31,11 @@ SOURCES += \
     units.cpp
 
 HEADERS += \
+    ammo.h \
+    brain.h \
+    build.h \
     camera.h \
+    collres.h \
     connect.h \
     govector.h \
     grapcollitem.h \
@@ -47,3 +54,4 @@ TRANSLATIONS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+

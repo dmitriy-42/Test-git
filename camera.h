@@ -1,6 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
-#include <QObject>
+#include "collres.h"
 
 
 class Camera//: public  QObject

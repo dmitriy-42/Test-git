@@ -1,7 +1,6 @@
 #ifndef CONNECT_H
 #define CONNECT_H
-
-#endif // CONNECT_H
+#include "collres.h"
 
 /*
 #ifdef __WIN32__
@@ -11,7 +10,6 @@
 #endif
 */
 
-
 class Connect
 {
 public:
@@ -20,3 +18,5 @@ public:
   virtual void send() = 0;
   virtual void recv() = 0;
 };
+
+#endif // CONNECT_H

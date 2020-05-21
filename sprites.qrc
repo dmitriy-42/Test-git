@@ -1,0 +1,14 @@
+<RCC>
+    <qresource prefix="/">
+        <file>block1.png</file>
+        <file>sprite/HW.png</file>
+        <file>sprite/LW.png</file>
+        <file>sprite/MW.png</file>
+        <file>sprite/MT.png</file>
+        <file>sprite/LT.png</file>
+        <file>sprite/HT.png</file>
+        <file>sprite/arty.png</file>
+        <file>sprite/ammo.png</file>
+        <file>sprite/gun.png</file>
+    </qresource>
+</RCC>

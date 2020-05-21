@@ -1,15 +1,11 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+#include "collres.h"
 
 #include "sprite.h"
-#include <QMainWindow>
-#include <QGraphicsScene>
-#include <QTimer>
 #include "camera.h"
 #include "connect.h"
 #include "map.h"
-
-#include "map"
 
 
 QT_BEGIN_NAMESPACE
@@ -24,7 +20,9 @@ public:
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 private:
+  Kostul* kostul;
   QTimer* timer1;
+  QTimer* timerMap;
   Sprites* sprites;
   Camera* camera;
   Ui::MainWindow *ui;

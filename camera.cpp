@@ -4,8 +4,8 @@ Camera::Camera()
 {
   x = 0.0;
   y = 0.0;
-  a = 0.0;
-  h = 1;
+  a = -30.0;
+  h = 0.03;
 }
 
 double Camera::getX(){return x;}

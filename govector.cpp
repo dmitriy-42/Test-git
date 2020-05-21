@@ -25,6 +25,12 @@ void GoVector::addPos(double x, double y, double z)
   this->z+=z;
 }
 
+void GoVector::addPos(Cord* cord)
+{
+  this->x = cord->x;
+  this->y = cord->y;
+}
+
 void GoVector::setSpeed(double speed)
 {
   if (ifClear()) return;
@@ -53,7 +59,7 @@ double GoVector::getZ(){return z;}
 
 double GoVector::getA()
 {
-  return atan(y/x);
+  return atan2(y, x);
 }
 
 bool GoVector::ifClear()

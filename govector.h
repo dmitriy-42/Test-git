@@ -1,7 +1,6 @@
 #ifndef GOVECTOR_H
 #define GOVECTOR_H
-#include <cmath>
-#define PI 3.14159265                               // число ПИ
+#include "collres.h"
 
 class GoVector
 {
@@ -11,6 +10,7 @@ public:
   void addVector(GoVector* vector);
   void addVector(GoVector vector);
   void addPos(double x, double y, double z);
+  void addPos(Cord* cord);
   void setSpeed(double speed);
   void clear();
   double getSpeed();
