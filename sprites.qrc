@@ -10,5 +10,8 @@
         <file>sprite/arty.png</file>
         <file>sprite/ammo.png</file>
         <file>sprite/gun.png</file>
+        <file>sprite/none.png</file>
+        <file>sprite/Detect.png</file>
+        <file>sprite/Name1.png</file>
     </qresource>
 </RCC>

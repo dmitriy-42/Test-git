@@ -1,8 +1,8 @@
 #include "units.h"
 
 
-Unit::Unit(UnitDataBuild* data, double x ,double y, QGraphicsScene* scene, Camera* camera,  Sprites* sprites, Map* myMap)
-  :x(x), y(y), scene(scene), myMap(myMap)
+Unit::Unit(UnitDataBuild* data, double x ,double y, QGraphicsScene* scene, Camera* camera, Sprites* sprites, Map* myMap)
+  :id(data->id), x(x), y(y), scene(scene), myMap(myMap)
 {
   rect = new QRectF;
   rect->setX(x);
@@ -10,11 +10,13 @@ Unit::Unit(UnitDataBuild* data, double x ,double y, QGraphicsScene* scene, Camer
 
   moveVect = new GoVector;
 
-  a = 0;
+  *a = 0;
 
   initMove(data->move);
   initArrmor(data->arrmor);
   gunSlots* guns = arrmor->getSlots();
+  rect->setWidth(arrmor->getSprite(myMove->Type(), sprites)->w);
+  rect->setHeight(arrmor->getSprite(myMove->Type(), sprites)->h);
   for (int i = 0; i < guns->len;i++)
   {
     initGun(data->guns[i], i, guns->slot[i], sprites, camera, rect);
@@ -28,23 +30,25 @@ Unit::Unit(UnitDataBuild* data, double x ,double y, QGraphicsScene* scene, Camer
   delete guns;
 }
 
-Unit::Unit(UnitData* data, Camera *camera,  Sprites* sprites, Map* myMap)
-  :myMap(myMap)
+Unit::Unit(UnitData* data, QGraphicsScene* scene, Camera *camera, Sprites* sprites, Map* myMap)
+  :id(data->id), scene(scene), myMap(myMap)
 {
-  rect = new QRectF;
-  rect->setX(x);
-  rect->setY(y);
-
   moveVect = new GoVector;
 
   x = data->x;
   y = data->y;
-  a = data->a;
+  *a = data->a;
   health = data->health;
+
+  rect = new QRectF;
+  rect->setX(x);
+  rect->setY(y);
 
   initMove(data->move);
   initArrmor(data->arrmor);
   gunSlots* guns = arrmor->getSlots();
+  rect->setWidth(arrmor->getSprite(myMove->Type(), sprites)->w);
+  rect->setHeight(arrmor->getSprite(myMove->Type(), sprites)->h);
   for (int i = 0; i < guns->len;i++)
   {
     initGun(data->guns[i], i, guns->slot[i], sprites, camera, rect);
@@ -66,7 +70,9 @@ Unit::~Unit()
   {
     delete guns[i];
   }
-  //Здесь утечка памяти, на днях исправлю.
+  //delete brain;
+  delete rect;
+  delete moveVect;
 }
 
 Cord *Unit::getCord()
@@ -79,11 +85,17 @@ Cord *Unit::getCord()
 
 void Unit::act()
 {
-  brain->Move();
+  //brain->Move();
+
+  moveVect->clear();
+  std::cout << "Move Clear " << moveVect->getX() << " " << moveVect->getY() << '\n';
 
   moveVect->addVector(brain->Move());
+  std::cout << "Move A " << moveVect->getX() << " " << moveVect->getY() << '\n';
+  if (moveVect->getSpeed()) *a = moveVect->getA();
   moveVect->setSpeed(myMove->speed(arrmor->getMass()));
-  a = moveVect->getA();
+  std::cout << "Move A set Speed " << moveVect->getX() << " " << moveVect->getY() << " " << myMove->speed(arrmor->getMass()) << '\n';
+
 
   QList <QGraphicsItem *> collList = scene->collidingItems(GrItem);
   for (int i = 0; i < collList.size();i++)
@@ -95,7 +107,7 @@ void Unit::act()
       {
         GoVector vect;
         vect.addPos(x- j->getRealX(),y- j->getRealY(),0);
-        vect.setSpeed(vect.getSpeed()/2.0);
+        vect.setSpeed(vect.getSpeed()/3.0);
         moveVect->addVector(vect);
       }
     }
@@ -119,14 +131,16 @@ void Unit::act()
 
 void Unit::move()
 {
-
   x += moveVect->getX();
   y += moveVect->getY();
   rect->setX(x);
   rect->setY(y);
-  GrItem->setRealPos(x, y, a);
+  GrItem->setRealPos(x, y, *a);
   moveVect->clear();
-
+  for (int i = 0; i < arrmor->getLenGun(); i++)
+    {
+      guns[i]->updataGr();
+    }
 }
 
 bool Unit::dead()
@@ -140,6 +154,11 @@ bool Unit::dead()
   case BaseMoveType::None: std::cerr << "Unit have BaseMove None!!!";
   }
   return isdead or health <= 0;
+}
+
+unsigned long long Unit::getUserId()
+{
+  return id;
 }
 
 void Unit::initMove(MoveType type)
@@ -170,9 +189,9 @@ void Unit::initGun(gunType type, int index, gunSlot gun, Sprites* sprite, Camera
   Gun* g;
   switch (type)
   {
-  case gunType::Gun: g = new GunGun(gun, sprite, camera, rect, scene,myMap, arrmor->getAttacPoints()); break;
-  case gunType::Arty: g = new GunArty(gun, sprite, camera, rect, scene,myMap, arrmor->getAttacPoints()); break;
-  default: g = new GunGun(gun, sprite, camera, rect, scene,myMap, arrmor->getAttacPoints());
+  case gunType::Gun: g = new GunGun(gun, sprite, camera, rect, scene,myMap, arrmor->getAttacPoints(), a); break;
+  case gunType::Arty: g = new GunArty(gun, sprite, camera, rect, scene,myMap, arrmor->getAttacPoints(), a); break;
+  default: g = new GunGun(gun, sprite, camera, rect, scene,myMap, arrmor->getAttacPoints(), a);
   }
   guns[index] = g;
 }
@@ -182,17 +201,51 @@ void Unit::initSprite(Camera* camera, Sprites* sprites)
   TypeObject type;
   if (myMove->getBaseMove() == BaseMoveType::Land) type = TypeObject::Unit;
   else type = TypeObject::UnitAir;
-  GrItem = new GrapCollItem(x,y,a,type,arrmor->getSprite(myMove->Type(), sprites),camera, brain, this);
+  GrItem = new GrapCollItem(x,y,*a,type,arrmor->getSprite(myMove->Type(), sprites),camera, brain, this);
   scene->addItem(GrItem);
 }
 
 void Unit::initBrain()
 {
   std::vector <HaveGun> * vect = new std::vector <HaveGun>;
-  rect = new QRectF;
   rect->setX(x);
   rect->setY(y);
   brain = new Brain(vect, nullptr, myMove->getBaseMove(), rect, 1, 0);
+}
+
+Unit::Gun::Gun(QRectF *rect, GrapCollItem *GrItem, gunSlot slot, double* unitA)
+  :unitA(unitA), slot(slot), a(0), GrItem(GrItem), rect(rect)
+{
+
+  w = GrItem->getRealW();
+  h = GrItem->getRealH();
+}
+
+Cord Unit::Gun::AtoXY(double x, double y, double a)
+{
+  Cord cord;
+  double q = (a/180)*PI;
+  double q2 = (a+90)/180*PI;
+
+  cord.x = x*cos(q)+y*cos(q2);
+  cord.y = x*sin(q)+y*sin(q2);
+
+  return cord;
+}
+
+Cord Unit::Gun::getCord()
+{
+  Cord cord = AtoXY(slot.x, slot.y, *unitA);
+  cord.x += rect->x();
+  cord.y += rect->y();
+  return cord;
+}
+
+void Unit::Gun::updataGr()
+{
+  Cord cord = getCord();
+  GrItem->setRealPos(cord.x, cord.y, a);
+  if (interval > 0) interval--;
 }
 
 bool Unit::isColl(GrapCollItem * Item)
@@ -262,7 +315,7 @@ gunSlots* Unit::ArrmorLight::getSlots()
   return guns;
 }
 
-Sprite *Unit::ArrmorLight::getSprite(MoveType move, Sprites* sprites)
+const Sprite *Unit::ArrmorLight::getSprite(MoveType move, Sprites* sprites)
 {
   return sprites->get(spMap + (int)Type()*spMove + (int)move);
 }
@@ -303,7 +356,7 @@ gunSlots* Unit::ArrmorMedium::getSlots()
   return guns;
 }
 
-Sprite *Unit::ArrmorMedium::getSprite(MoveType move, Sprites* sprites)
+const Sprite *Unit::ArrmorMedium::getSprite(MoveType move, Sprites* sprites)
 {
   return sprites->get(spMap + (int)Type()*spMove + (int)move);
 }
@@ -336,7 +389,7 @@ int Unit::ArrmorHeavy::getMass()
 gunSlots* Unit::ArrmorHeavy::getSlots()
 {
   gunSlot gun;
-  gun.x = 0;
+  gun.x = 0.0;
   gun.y = 0;
   gunSlots* guns = new gunSlots;
   guns->len = 1;
@@ -344,7 +397,7 @@ gunSlots* Unit::ArrmorHeavy::getSlots()
   return guns;
 }
 
-Sprite *Unit::ArrmorHeavy::getSprite(MoveType move, Sprites* sprites)
+const Sprite *Unit::ArrmorHeavy::getSprite(MoveType move, Sprites* sprites)
 {
   return sprites->get(spBArrmorAndMove + (int)Type()*spMove + (int)move);
 }
@@ -354,9 +407,9 @@ ArrmorType Unit::ArrmorHeavy::Type()
   return ArrmorType::Heavy;
 }
 
-int Unit::MoveWheels::speed(int mass)
+double Unit::MoveWheels::speed(int mass)
 {
-  return 0.1 * (1 - mass / 100);
+  return 1.0 * (1.0 - (double)mass / 100.0);
 }
 
 MoveType Unit::MoveWheels::Type()
@@ -375,9 +428,9 @@ int Unit::MoveWheels::getHealthPoints()
 }
 
 
-int Unit::MoveTracks::speed(int mass)
+double Unit::MoveTracks::speed(int mass)
 {
-  return 0.07 * (1 - mass / 100);
+  return 0.5 * (1.0 - (double)mass / 100.0);
 }
 
 MoveType Unit::MoveTracks::Type()
@@ -395,28 +448,18 @@ int Unit::MoveTracks::getHealthPoints()
   return 1;
 }
 
-Unit::GunGun::GunGun(gunSlot slot, Sprites* sprites, Camera* camera, QRectF* rect, QGraphicsScene* scene, Map* maps, int point)
-  :camera(camera), maps(maps), sprites(sprites), scene(scene), rect(rect), slot(slot), interval(0), point(point)
+Unit::GunGun::GunGun(gunSlot slot, Sprites* sprites, Camera* camera, QRectF* rect, QGraphicsScene* scene, Map* maps, int point, double* unitA)
+  :Gun(rect, new GrapCollItem(0.0, 0.0, 0, TypeObject::Gun, sprites->get(spBGun + (int)Type()), camera, nullptr, this), slot, unitA), camera(camera), maps(maps), sprites(sprites), scene(scene), point(point)
 {
   interval = 0;
-  Cord cord = getCord();
-  GrItem = new GrapCollItem(cord.x, cord.y, a, TypeObject::Gun, sprites->get(spBGun + (int)Type()), camera, nullptr, this);
   scene->addItem(GrItem);
 }
 
 int Unit::GunGun::getRange()
 {
-  return 10.0;
+  return 50.0;
 }
 
-Cord Unit::GunGun::getCord()
-{
-  //to do
-  Cord cord;
-  cord.x = rect->x();
-  cord.y = rect->y();
-  return cord;
-}
 
 TargetType Unit::GunGun::getTargType()
 {
@@ -448,37 +491,19 @@ gunType Unit::GunGun::Type()
   return gunType::Gun;
 }
 
-void Unit::GunGun::updataGr()
-{
-  Cord cord = getCord();
-  GrItem->setRealPos(cord.x,cord.y, a);
-  if (interval > 0) interval--;
-}
 
-
-
-Unit::GunArty::GunArty(gunSlot slot, Sprites* sprites, Camera* camera, QRectF* rect, QGraphicsScene* scene, Map* maps, int point)
-  :camera(camera), maps(maps), sprites(sprites), scene(scene), rect(rect), slot(slot), interval(0), point(point)
+Unit::GunArty::GunArty(gunSlot slot, Sprites* sprites, Camera* camera, QRectF* rect, QGraphicsScene* scene, Map* maps, int point, double* unitA)
+  :Gun(rect, new GrapCollItem(0.0, 0.0, 0, TypeObject::Gun, sprites->get(spBGun + (int)Type()), camera, nullptr, this), slot, unitA), camera(camera), maps(maps), sprites(sprites), scene(scene), rect(rect), point(point)
 {
   interval = 0;
-  Cord cord = getCord();
-  GrItem = new GrapCollItem(cord.x, cord.y, a, TypeObject::Gun, sprites->get(spBGun + (int)Type()), camera, nullptr, this);
   scene->addItem(GrItem);
 }
 
 int Unit::GunArty::getRange()
 {
-  return 10.0;
+  return 200.0;
 }
 
-Cord Unit::GunArty::getCord()
-{
-  //to do
-  Cord cord;
-  cord.x = rect->x();
-  cord.y = rect->y();
-  return cord;
-}
 
 TargetType Unit::GunArty::getTargType()
 {
@@ -508,11 +533,4 @@ void Unit::GunArty::attac(void *targ)
 gunType Unit::GunArty::Type()
 {
   return gunType::Arty;
-}
-
-void Unit::GunArty::updataGr()
-{
-  Cord cord = getCord();
-  GrItem->setRealPos(cord.x,cord.y, a);
-  if (interval > 0) interval--;
 }

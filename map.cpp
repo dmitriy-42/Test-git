@@ -1,13 +1,13 @@
 #include "map.h"
 
-Block::Block(int x, int y, Sprite *sprite, QGraphicsScene *scene, Camera* camera)
+Block::Block(int x, int y, const Sprite *sprite, QGraphicsScene *scene, Camera* camera)
   :x(x), y(x), scene(scene)
 {
   grap = new GrapCollItem(x, y, 0, TypeObject::Block, sprite, camera, nullptr, this);
   scene->addItem(grap);
 }
 
-Block::Block(Sprite *sprite, QGraphicsScene *scene, Camera *camera)
+Block::Block(const Sprite *sprite, QGraphicsScene *scene, Camera *camera)
   :scene(scene)
 {
   x = 0;
@@ -78,7 +78,6 @@ void Map::clear()
 
 void Map::start()
 {
-  std::cout << "start\n";
   act();
   move();
   deadUnit.clear();
@@ -137,6 +136,17 @@ void Map::delAmmo(BaseAmmo *ammo)
   delete ammo; //virtual ~BaseAmmo();
 }
 
+void Map::addBuild(Build *build)
+{
+  this->build[build] = build;
+}
+
+void Map::delBuild(Build *build)
+{
+  this->build.erase(build);
+  delete build; //virtual ~BaseAmmo();
+}
+
 void Map::act()
 {
 
@@ -146,6 +156,11 @@ void Map::act()
   }
 
   for(auto it = units.begin();it != units.end(); ++it)
+  {
+    it->second->act();
+  }
+
+  for(auto it = build.begin();it != build.end(); ++it)
   {
     it->second->act();
   }
@@ -173,5 +188,9 @@ void Map::dead()
   for(auto it = units.begin();it != units.end(); ++it)
   {
     if (it->second->dead()) delUnit(it->second);
+  }
+  for(auto it = build.begin();it != build.end(); ++it)
+  {
+    it->second->dead();
   }
 }

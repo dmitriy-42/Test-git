@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "connect.h"
 #include "map.h"
+#include "myscene.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -20,6 +21,7 @@ public:
   MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
 private:
+  User* users[MaxUser];
   Kostul* kostul;
   QTimer* timer1;
   QTimer* timerMap;

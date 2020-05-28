@@ -27,8 +27,10 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     map.cpp \
+    myscene.cpp \
     sprite.cpp \
-    units.cpp
+    units.cpp \
+    user.cpp
 
 HEADERS += \
     ammo.h \
@@ -41,8 +43,10 @@ HEADERS += \
     grapcollitem.h \
     mainwindow.h \
     map.h \
+    myscene.h \
     sprite.h \
-    units.h
+    units.h \
+    user.h
 
 FORMS += \
     mainwindow.ui

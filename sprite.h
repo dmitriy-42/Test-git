@@ -13,10 +13,10 @@ void IndexError(int index, const char* f);
 class Sprites
 {
 public:
-  Sprites();
+  Sprites(QImage* foc, unsigned long long id=(unsigned long long)nullptr);
   ~Sprites();
   void create(int size);
-  Sprite* get(int index);
+  const Sprite* get(int index);
   void set(int index, Sprite* sprite);
   void resize(int newSize);
   void free();
@@ -27,6 +27,8 @@ public:
 
   bool spriteLoad();
 private:
+  unsigned long long id;
+  QImage* foc;
   Sprite** data;
   int size;
 };

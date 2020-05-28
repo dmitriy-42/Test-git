@@ -6,6 +6,7 @@
 #include "grapcollitem.h"
 #include "sprite.h"
 #include "ammo.h"
+#include "build.h"
 typedef std::pair<int, int> Coord;
 // Используестя map в качестве словоря, возможно стоило создать что то более подходящее... Но времени может не хватить.
 
@@ -13,8 +14,8 @@ typedef std::pair<int, int> Coord;
 class Block
 {
 public:
-  Block(int x, int y, Sprite *sprite, QGraphicsScene *scene, Camera* camera);
-  Block(Sprite *sprite, QGraphicsScene *scene, Camera* camera);
+  Block(int x, int y, const Sprite *sprite, QGraphicsScene *scene, Camera* camera);
+  Block(const Sprite *sprite, QGraphicsScene *scene, Camera* camera);
   ~Block();
 
   int getX();
@@ -46,6 +47,8 @@ public:
   void delUnit(Unit* unit);
   void addAmmo(BaseAmmo* ammo);
   void delAmmo(BaseAmmo* ammo);
+  void addBuild(Build* build);
+  void delBuild(Build* build);
 
   void start();
 private:
@@ -58,6 +61,7 @@ private:
   QGraphicsScene *scene;
   std::map <Unit*, Unit*> units;
   std::map <BaseAmmo*, BaseAmmo*> ammos;
+  std::map <Build*, Build*> build;
   std::map <Coord, Block*> mapBlock;
   Camera* camera;
   Sprites* sprites;

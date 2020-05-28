@@ -10,7 +10,8 @@ void IndexError(Sprites* sprites, int index, const char* f)
 }
 
 
-Sprites::Sprites()
+Sprites::Sprites(QImage* foc, unsigned long long id)
+  :id(id), foc(foc)
 {
   data = nullptr;
 }
@@ -28,7 +29,7 @@ void Sprites::create(int size)
   for (int i = 0;i<size;i++){data[i] = nullptr;}
 }
 
-Sprite* Sprites::get(int index)
+const Sprite* Sprites::get(int index)
 {
   if (size < index or index + size < 0) IndexError(this, index, "get");
   if (index < 0) index += size;
@@ -40,6 +41,7 @@ void Sprites::set(int index, Sprite* sprite)
 {
   if (size < index or index + size < 0) IndexError(this, index, "set");
   if (index < 0) index += size;
+  sprite->foc = foc;
   data[index] = sprite;
 }
 

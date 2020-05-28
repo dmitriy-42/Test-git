@@ -27,9 +27,13 @@
 #include <map>
 #include <utility>
 
+#include <QGraphicsSceneMouseEvent>
+
 
 const double PI = 3.14159265;
 const int MaxGun = 10;
+const int MaxUser = 8;
+const double E = 0.0001; //Точность сравнения дробных чисел
 
 
 class Unit;
@@ -48,15 +52,17 @@ class Unit;
 class BaseAmmo;
 class Ammo;
 
+enum class ResourceType{T1,T2,T3,T4,T5, D1,D2,D3,D4,D5, Plate, Elect, Mech, MicroFab, Engine};
+const int lenResType = 13; //Количество видов ресурсов
 
 enum class AmmoType{Def, Arty, Rocket};
 enum class HaveGun{None, Air, Land, Water};
 enum class HaveBuild{None, Build, Unit};
 enum class TargetType{Unit, Build, Cord};
 enum class Command{Pass, Go, Attack, Build, RmBuild, BuildUnit, Patrol, BuildCircle, NotBuildCircle};
-enum class BuildType{};
+enum class BuildType{MainBuild, Recycler, PlateFab};
 enum class TypeObject {Gun, Unit, UnitAir, Block, Ammo, Resource, Building, Stone};
-enum class TypeGrap {Detect, GrapCollItem, Kastul};
+enum class TypeGrap {Detect, GrapCollItem, Icon, Kastul};
 enum class TypeBlock{Default};
 
 enum class gunType{Gun, Minigun, Arty, AntiAir/*Rocket*/}; // Изменения вроде ArrmorType{Light=1, ...}
@@ -64,6 +70,20 @@ enum class ArrmorType{Light, Medium, Heavy, Over};         // Могут рив�
 enum class MoveType{Wheels, Tracks, Plane, Jet};           //
 
 enum class BaseMoveType{None, Air, Land}; //Деление на воздушных, наземных и тех кто не может перемещяться.
+
+enum class Color{Green, Blue, Orange, Red, Violet, Yellow};
+
+struct FullResource
+{
+  int i;
+  ResourceType type;
+};
+
+struct Resources
+{
+  FullResource res[20];
+  int len;
+};
 
 struct BrainGun{
   HaveGun gun[MaxGun];
@@ -89,6 +109,7 @@ struct BuildDataBuild
   int y;
   int a;
   BuildType type;
+  unsigned long long id;
 };
 
 struct gunSlot
@@ -108,6 +129,7 @@ struct UnitDataBuild // Данные для создания юнитов
   int lenGun;
   ArrmorType arrmor;
   MoveType move;
+  unsigned long long id;
 };
 
 struct UnitData
@@ -115,6 +137,7 @@ struct UnitData
   double x; double y; double a; double health;
   ArrmorType arrmor; MoveType move; gunType guns[MaxGun];
   int aGuns[MaxGun]; QGraphicsScene* scene;
+  unsigned long long id;
 };
 
 struct FullCommand // Хранит команду и данные к ней (не все данные будут использованны (зависит от команды))
@@ -131,7 +154,9 @@ struct FullCommand // Хранит команду и данные к ней (н�
 struct Sprite
 {
   QImage* tex;
+  QImage* foc;
   double w, h; // not pixel (real w, h)
+  unsigned long long id;
 };
 
 
@@ -154,7 +179,9 @@ const int spBCommand = spBEffect + spEffect;
 const int spCommand = 16;
 const int spBResIcon = spBCommand + spCommand;
 const int spResIcon = 32;
-const int spLen = spBResIcon + spResIcon;
+const int spBNone = spBResIcon + spResIcon;
+const int spNone = 1;
+const int spLen = spBNone + spNone;
 
 #endif // COLLRES_H
 

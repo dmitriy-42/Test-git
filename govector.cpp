@@ -10,6 +10,7 @@ GoVector::~GoVector() = default;
 
 void GoVector::addVector(GoVector* vector)
 {
+  std::cout << "GoVect " << vector->getX() << " " << vector->getY() << "\n";
   addPos(vector->getX(), vector->getY(), vector->getZ());
 }
 

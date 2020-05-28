@@ -46,7 +46,12 @@ void Brain::push(FullCommand *command)
       break;
     default:
       commands.push(command);
-  }
+    }
+}
+
+void Brain::clear()
+{
+  while (commands.size()) commands.pop();
 }
 
 GoVector* Brain::Move()
@@ -59,7 +64,20 @@ GoVector* Brain::Move()
   Cord cord;
   cord.x = (double)rect->x();
   cord.y = (double)rect->y();
+  std::cout << "Move b\n";
+  if (com->com == Command::Go)
+    {
+      std::cout << "x y " << com->cord->at(0)->x << ' ' << com->cord->at(0)->y << '\n';
+      std::cout << "2 x y " << cord.x << ' ' << cord.y << '\n';
+      if (abs(com->cord->at(0)->x - cord.x) > 1.5 and abs(com->cord->at(0)->y - cord.y) > 1.5)
+      {
+        cord.x += com->cord->at(0)->x;
+        cord.y += com->cord->at(0)->y;
+      }
+    }
+  vect->addPos(&cord);
 
+  /*
   if (route == nullptr)
   {
     Cord* d = nullptr;
@@ -92,6 +110,7 @@ GoVector* Brain::Move()
       cord.x = route->top()->x - cord.x;
       cord.y = route->top()->y - cord.y;
     }
+
     vect->addPos(&cord);
     delete d;
   }
@@ -99,6 +118,7 @@ GoVector* Brain::Move()
   {
     vect->addPos(cord.y - route->top()->y, cord.x - route->top()->x, 0);
   }
+  */
 
   return vect;
 }

@@ -13,7 +13,7 @@ class Unit
 {
 public:
   Unit(UnitDataBuild*, double x ,double y, QGraphicsScene* scene, Camera*, Sprites* sprites, Map* myMap);
-  Unit(UnitData*, Camera*,  Sprites* sprites, Map* myMap); //Использовать только при загрузке
+  Unit(UnitData* data, QGraphicsScene* scene, Camera *camera, Sprites* sprites, Map* myMap); //Использовать только при загрузке
   ~Unit();
 
   Cord* getCord();
@@ -22,7 +22,10 @@ public:
   void move();
   bool dead();
 
+  unsigned long long getUserId();
+
 private:
+  unsigned long long id;
   void initMove(MoveType type);
   void initArrmor(ArrmorType type);
   void initGun(gunType type, int index, gunSlot gun, Sprites* sprite, Camera* camera, QRectF* rect);
@@ -35,7 +38,7 @@ private:
 
   double x;
   double y;
-  double a;
+  double* a = new double;
   double r;
   bool isColl(GrapCollItem*);
   bool isCollLand(GrapCollItem*);
@@ -53,13 +56,25 @@ private:
   class Gun
   {
   public:
+    Gun(QRectF* rect, GrapCollItem* GrItem, gunSlot slot, double* unitA);
     virtual ~Gun() = default;
     virtual int getRange() = 0;
-    virtual Cord getCord() = 0;
+    Cord AtoXY(double x, double y, double a);
+    Cord getCord();
     virtual TargetType getTargType() = 0;
     virtual void attac(void* targ) = 0; // static_cast<>(targ), Во что именно см getTargType
     virtual gunType Type() = 0;
-    virtual void updataGr() = 0;
+    void updataGr();
+  protected:
+    double test = 0;
+    double* unitA;
+    gunSlot slot;
+    int interval;
+    double a;
+    GrapCollItem* GrItem;
+    QRectF* rect;
+    double h;
+    double w;
   };
 
   class Arrmor
@@ -70,14 +85,14 @@ private:
     virtual int getAttacPoints() = 0;
     virtual int getLenGun() = 0;
     virtual int getMass() = 0;
-    virtual Sprite* getSprite(MoveType, Sprites*) = 0;
+    virtual const Sprite* getSprite(MoveType, Sprites*) = 0;
     virtual ArrmorType Type() = 0;
   };
 
   class Move
   {
   public:
-    virtual int speed(int /*mass*/) = 0;
+    virtual double speed(int /*mass*/) = 0;
     virtual MoveType Type() = 0;
     virtual BaseMoveType getBaseMove() = 0;
     virtual int getHealthPoints() = 0;
@@ -86,46 +101,34 @@ private:
   class GunGun: public Gun
   {
   public:
-    GunGun(gunSlot slot, Sprites* sprites, Camera* camera, QRectF* rect, QGraphicsScene* scene, Map* maps, int point);
+    GunGun(gunSlot slot, Sprites* sprites, Camera* camera, QRectF* rect, QGraphicsScene* scene, Map* maps, int point, double* unitA);
     int getRange() override;
-    Cord getCord() override;
     TargetType getTargType() override;
     void attac(void* targ) override; // static_cast<>(targ), Во что именно см getTargType
     gunType Type() override;
-    void updataGr() override;
   private:
     Camera* camera;
     Map* maps;
     Sprites* sprites;
     QGraphicsScene* scene;
-    GrapCollItem* GrItem;
     QRectF* rect;
-    gunSlot slot;
-    int interval;
-    double a;
     int point;
   };
 
   class GunArty: public Gun
   {
   public:
-    GunArty(gunSlot slot, Sprites* sprites, Camera* camera, QRectF* rect, QGraphicsScene* scene, Map* maps, int point);
+    GunArty(gunSlot slot, Sprites* sprites, Camera* camera, QRectF* rect, QGraphicsScene* scene, Map* maps, int point, double* unitA);
     int getRange() override;
-    Cord getCord() override;
     TargetType getTargType() override;
     void attac(void* targ) override; // static_cast<>(targ), Во что именно см getTargType
     gunType Type() override;
-    void updataGr() override;
   private:
     Camera* camera;
     Map* maps;
     Sprites* sprites;
     QGraphicsScene* scene;
-    GrapCollItem* GrItem;
     QRectF* rect;
-    gunSlot slot;
-    int interval;
-    double a;
     int point;
   };
 
@@ -137,7 +140,7 @@ private:
     int getLenGun() override;
     int getMass() override;
     gunSlots* getSlots() override;
-    Sprite* getSprite(MoveType move, Sprites* sprites) override;
+    const Sprite* getSprite(MoveType move, Sprites* sprites) override;
     ArrmorType Type() override;
   };
 
@@ -148,7 +151,7 @@ private:
     int getLenGun() override;
     int getMass() override;
     gunSlots* getSlots() override;
-    Sprite* getSprite(MoveType move, Sprites* sprites) override;
+    const Sprite* getSprite(MoveType move, Sprites* sprites) override;
     ArrmorType Type() override;
   };
 
@@ -159,14 +162,14 @@ private:
     int getLenGun() override;
     int getMass() override;
     gunSlots* getSlots() override;
-    Sprite* getSprite(MoveType move, Sprites* sprites) override;
+    const Sprite* getSprite(MoveType move, Sprites* sprites) override;
     ArrmorType Type() override;
   };
 
   class MoveWheels: public Move
   {
   public:
-    int speed(int /*mass*/);
+    double speed(int /*mass*/);
     MoveType Type();
     BaseMoveType getBaseMove();
     int getHealthPoints();
@@ -175,7 +178,7 @@ private:
   class MoveTracks: public Move
   {
   public:
-    int speed(int /*mass*/);
+    double speed(int /*mass*/);
     MoveType Type();
     BaseMoveType getBaseMove();
     int getHealthPoints();
